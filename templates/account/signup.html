@@ -1,0 +1,130 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Login Form</title>
+    <link rel="stylesheet" href="{% static 'css/accounts_style.css' %}">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="company-logo">
+                    <div class="logo-icon">🏢</div>
+                </div>
+                <h2>Welcome Back</h2>
+                <p>Please sign in to your corporate account</p>
+            </div>
+
+            <form method="post" class="login-form" novalidate>
+                {% csrf_token %}
+                <!-- {{ form.as_p }} -->
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <input type="email" name="email" required autocomplete="email">
+                        <label for="email">Email (optional)</label>
+                        <span class="input-border"></span>
+                    </div>
+                    <span class="error-message"></span>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <input type="text" name="username" required autocomplete="username">
+                        <label for="username">Username</label>
+                        <span class="input-border"></span>
+                    </div>
+                    <span class="error-message"></span>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrapper password-wrapper">
+                        <input type="password" name="password1" required autocomplete="new-password">
+                        <label for="password">Password</label>
+                        <button type="button" class="password-toggle" id="password1Toggle"
+                            aria-label="Toggle password visibility">
+                            <span class="toggle-icon"></span>
+                        </button>
+                        <span class="input-border"></span>
+                    </div>
+                    <span class="error-message"></span>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrapper password-wrapper">
+                        <input type="password" name="password2" required autocomplete="new-password">
+                        <label for="password">Confirm Password</label>
+                        <button type="button" class="password-toggle" id="password1Toggle"
+                            aria-label="Toggle password visibility">
+                            <span class="toggle-icon"></span>
+                        </button>
+                        <span class="input-border"></span>
+                    </div>
+                    <span class="error-message"></span>
+                </div>
+                <button type="submit" class="login-btn">
+                    <span class="btn-text">Sign Up</span>
+                    <span class="btn-loader"></span>
+                </button>
+            </form>
+
+
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <span class="separator">•</span>
+                <a href="{% url 'account_login' %}" class="footer-link">have an account?</a>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <div class="success-icon">✓</div>
+                <h3>Authentication Successful</h3>
+                <p>Redirecting to your workspace...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/script.js' %}"></script>
+    <script src="{% static 'js/messages.js' %}"></script>
+    <script src="{% static 'js/form_errors.js' %}"></script>
+
+
+    {% if messages %}
+    <div id="message-container1" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        {% for message in messages %}
+        <div class="toast-message {{ message.tags }}" style="
+           background-color: #333; color: #fff; padding: 10px 20px; 
+           margin-bottom: 10px; border-radius: 5px; opacity: 0.95;
+           box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+    {% if form.errors %}
+    <div id="form-error-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+                <div class="toast-error" style="
+                     background-color: #f44336; color: #fff; padding: 10px 20px; 
+                     margin-bottom: 10px; border-radius: 5px; opacity: 0.95;
+                     box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+                    {% if field != '__all__' %}
+                        {{ field }}: {{ error }}
+                    {% else %}
+                        {{ error }}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</body>
+
+</html>

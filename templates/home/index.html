@@ -33,9 +33,11 @@
                     <input ng-model="yourDescription" type="text" name="description" class="form-control input_parent"
                         value="{{ form.description.value|default:'' }}" placeholder="Enter a description here" />
                 </div>
-                <button type="submit" class="btn btn-primary mr-3">
-                    Save
-                </button>
+                <div class="parent save">
+                    <button type="submit" class="btn btn-primary mr-3">
+                        Save
+                    </button>
+                </div>
             </form>
         </div>
         {{ yourName }}
@@ -87,40 +89,19 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <div class="parent">
+                <form method="post" action="{% url 'account_logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary mr-3">
+                        logout
+                    </button>
+
+                </form>
+            </div>
         </div>
     </div>
-    <script>
-        var app = angular.module("myApp", []);
-        app.controller("myController", function ($scope) {
-            $scope.tasks = [];
-            // $scope.saved = localStorage.getItem("tasks");
-            // $scope.tasks =
-            //   localStorage.getItem("tasks") !== null
-            //     ? JSON.parse($scope.saved)
-            //     : [
-            //         { task_name: "Learn AngularJS", status: false },
-            //         { task_name: "Build an Angular app", status: false }
-            //       ];
-            // localStorage.setItem("tasks", JSON.stringify($scope.tasks));
-            $scope.saveTask = function () {
-                $scope.tasks.push({ task_name: $scope.yourTask, status: false });
-                //   localStorage.setItem("tasks", JSON.stringify($scope.tasks));
-            };
-            $scope.getTask = function () {
-                var oldTasks = $scope.tasks;
-                $scope.tasks = [];
-                angular.forEach(oldTasks, function (task) {
-                    if (!task.done) $scope.tasks.push(task);
-                });
-                localStorage.setItem("tasks", JSON.stringify($scope.tasks));
-            };
-            $scope.delete = function (i) {
-                $scope.tasks.splice(i, 1);
-            };
-            $scope.finished = function (i) {
-                $scope.tasks[i].status = true;
-            };
-        });
+    <script src="{% static 'js/home_index.js' %}">
+
     </script>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
         integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
@@ -131,6 +112,21 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
+
+    <script src="{% static 'js/messages.js' %}"></script>
+
+    {% if messages %}
+    <div id="message-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        {% for message in messages %}
+        <div class="toast-message {{ message.tags }}" style="
+               color: #fff; padding: 10px 20px; 
+               margin-bottom: 10px; border-radius: 5px; opacity: 0.95;
+               box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </body>
 
 </html>

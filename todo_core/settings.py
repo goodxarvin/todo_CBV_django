@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
+from django.conf.global_settings import LOGIN_REDIRECT_URL, LOGOUT_REDIRECT_URL
 
 
 
@@ -46,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "home",
+    "allauth",
+    'allauth.account',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+     "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'todo_core.urls'
@@ -70,6 +74,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
             ],
         },
     },
@@ -136,3 +141,13 @@ STATICFILES_DIRS = [BASE_DIR / 'staticfiles']
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# login-logout redirection
+
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
+# disable email validation
+
+ACCOUNT_EMAIL_VERIFICATION = "none"

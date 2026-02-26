@@ -5,6 +5,7 @@ from .forms import ObjectiveForm
 from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 
@@ -18,7 +19,7 @@ def FinishedObjectiveView(request, pk):
 #     template_name = 'home/index.html'
 
 
-class ObjectiveListView(ListView):
+class ObjectiveListView(LoginRequiredMixin, ListView):
     model = Objective
     template_name = 'home/index.html'
     context_object_name = 'objectives'
@@ -55,5 +56,5 @@ class UpdateObjectiveView(UpdateView):
             form.instance.title = self.get_object().title
         if not form.cleaned_data.get('description'):
             form.instance.description = self.get_object().description
-            
+
         return super().form_valid(form)
