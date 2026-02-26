@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  todo_web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=todo_core.settings
+      - DJANGO_SECRET_KEY=django-insecure-d92cq)nht1(hkz9s74no$o==v6x=12^*p!jas9acuwuvo$9h7=
+      - DJANGO_DEBUG=True
