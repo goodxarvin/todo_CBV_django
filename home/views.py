@@ -2,13 +2,15 @@ from django.shortcuts import render
 from django.views.generic import TemplateView, CreateView, ListView, DeleteView, UpdateView
 from .models import Objective
 from .forms import ObjectiveForm
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 
 
-
+@login_required
 def FinishedObjectiveView(request, pk):
     objective = get_object_or_404(Objective, id=pk)
     objective.status = True
@@ -25,19 +27,30 @@ class ObjectiveListView(LoginRequiredMixin, ListView):
     context_object_name = 'objectives'
     paginate_by = 10
 
-class CreateObjectiveView(CreateView):
+
+class CreateObjectiveView(LoginRequiredMixin, CreateView):
     model = Objective
     form_class = ObjectiveForm
     # fields = ['title', 'description']
-    template_name = 'home/index.html'
+    template_name = 'home/create.html'
     success_url = reverse_lazy('home:list_objective')
 
-class DeleteObjectiveView(DeleteView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context_list= Objective.objects.all()
+        paginator = Paginator(context_list, 5)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context['objectives'] = page_obj
+        # print(Objective.objects.all())
+        return context
+
+class DeleteObjectiveView(LoginRequiredMixin, DeleteView):
     model = Objective
     template_name = 'home/index.html'
     success_url = reverse_lazy('home:list_objective')
 
-class UpdateObjectiveView(UpdateView):
+class UpdateObjectiveView(LoginRequiredMixin, UpdateView):
     model = Objective
     form_class = ObjectiveForm
     template_name = 'home/update.html'
