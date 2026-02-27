@@ -164,3 +164,5 @@ LOGOUT_REDIRECT_URL = "/"
 # disable email validation
 
 ACCOUNT_EMAIL_VERIFICATION = "none"
+
+#AUTH_USER_MODEL = 'auth.User'

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import TemplateView, CreateView, ListView, DeleteView, UpdateView
+from django.views.generic import CreateView, ListView, DeleteView, UpdateView
 from .models import Objective
 from .forms import ObjectiveForm
 from django.contrib.auth.decorators import login_required
@@ -23,6 +23,8 @@ def FinishedObjectiveView(request, pk):
 
 class ObjectiveListView(LoginRequiredMixin, ListView):
     model = Objective
+    def get_queryset(self):
+        return Objective.objects.filter(owner=self.request.user)
     template_name = 'home/index.html'
     context_object_name = 'objectives'
     paginate_by = 10
@@ -30,6 +32,8 @@ class ObjectiveListView(LoginRequiredMixin, ListView):
 
 class CreateObjectiveView(LoginRequiredMixin, CreateView):
     model = Objective
+    def get_queryset(self):
+        return Objective.objects.filter(owner=self.request.user)
     form_class = ObjectiveForm
     # fields = ['title', 'description']
     template_name = 'home/create.html'
@@ -44,14 +48,23 @@ class CreateObjectiveView(LoginRequiredMixin, CreateView):
         context['objectives'] = page_obj
         # print(Objective.objects.all())
         return context
+    
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
 class DeleteObjectiveView(LoginRequiredMixin, DeleteView):
     model = Objective
+    http_method_names = ['post']
+    def get_queryset(self):
+        return Objective.objects.filter(owner=self.request.user)
     template_name = 'home/index.html'
     success_url = reverse_lazy('home:list_objective')
 
 class UpdateObjectiveView(LoginRequiredMixin, UpdateView):
     model = Objective
+    def get_queryset(self):
+        return Objective.objects.filter(owner=self.request.user)
     form_class = ObjectiveForm
     template_name = 'home/update.html'
     success_url = reverse_lazy('home:list_objective')
@@ -69,12 +82,13 @@ class UpdateObjectiveView(LoginRequiredMixin, UpdateView):
             form.instance.title = self.get_object().title
         if not form.cleaned_data.get('description'):
             form.instance.description = self.get_object().description
+        
 
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context_list= Objective.objects.all()
+        context_list= Objective.objects.filter(owner=self.request.user)
         paginator = Paginator(context_list, 5)
         page_number = self.request.GET.get('page')
         page_obj = paginator.get_page(page_number)
