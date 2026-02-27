@@ -12,7 +12,7 @@ from django.core.paginator import Paginator
 
 @login_required
 def FinishedObjectiveView(request, pk):
-    objective = get_object_or_404(Objective, id=pk)
+    objective = get_object_or_404(Objective, id=pk, owner=request.user)
     objective.status = True
     objective.save()
     return redirect('home:list_objective')
@@ -41,7 +41,8 @@ class CreateObjectiveView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context_list= Objective.objects.all()
+        # context_list= Objective.objects.all()
+        context_list = Objective.objects.filter(owner=self.request.user)
         paginator = Paginator(context_list, 5)
         page_number = self.request.GET.get('page')
         page_obj = paginator.get_page(page_number)

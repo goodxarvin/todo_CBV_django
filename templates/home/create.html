@@ -54,7 +54,7 @@
                 </thead>
                 <tbody>
                     {% for objective in objectives %}
-                    <tr>
+                    <tr class="{% if objective.status %}completed-row{% endif %}">
                         <td>{{ forloop.counter }}</td>
                         <td>{{ objective.title }}</td>
                         <td>{{ objective.description }}</td>
