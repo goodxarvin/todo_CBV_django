@@ -40,6 +40,55 @@
         </div>
         {{ yourName }}
         <div class="table-wrapper">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for objective in objectives %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ objective.title }}</td>
+                        <td>{{ objective.description }}</td>
+                        {% if objective.status %}
+                        <td class="complete">Completed</td>
+                        {% else %}
+                        <td>not completed</td>
+                        {% endif %}
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if not objective.status %}
+                                <a href="{% url 'home:update_objective' pk=objective.id %}" class="a_btn">Update</a>
+                                {% endif %}
+                                <form method="post" action="{% url 'home:delete_objective' pk=objective.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger input_parent" ng-click="delete($index)">
+                                        Delete
+                                    </button>
+                                </form>
+                                {% if not objective.status %}
+                                <form method="post" action="{% url 'home:finished_objective' pk=objective.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success input_parent"
+                                        ng-click="finished($index)">
+                                        Finished
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="parent">
+            </div>
         </div>
     </div>
     <script>

@@ -71,3 +71,13 @@ class UpdateObjectiveView(LoginRequiredMixin, UpdateView):
             form.instance.description = self.get_object().description
 
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context_list= Objective.objects.all()
+        paginator = Paginator(context_list, 5)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context['objectives'] = page_obj
+        # print(Objective.objects.all())
+        return context
