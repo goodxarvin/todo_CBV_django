@@ -8,7 +8,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - .env
+      - .env.todo_web
     entrypoint: ["/app/entrypoint.sh"]
     depends_on:
       - db
@@ -17,10 +17,8 @@ services:
     image: postgres:15
     container_name: todo_db
     restart: always
-    environment:
-      - POSTGRES_USER=todo_user
-      - POSTGRES_PASSWORD=todo_password
-      - POSTGRES_DB=todo_db
+    env_file:
+      - .env.db
     ports:
       - "5432:5432"
     volumes:
