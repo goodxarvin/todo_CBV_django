@@ -15,7 +15,7 @@ class ObjectiveViewSet(viewsets.ModelViewSet):
     serializer_class = ObjectiveSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = {"status":["exact"]}
-    search_fields = ["id", "title", "description",]
+    search_fields = ["id", "title", "description", "owner__username", "owner__email",]
     ordering_fields = ["created_at", "updated_at"]
     pagination_class = ObjectivePagination
 

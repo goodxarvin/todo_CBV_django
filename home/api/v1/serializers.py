@@ -10,21 +10,23 @@ class ObjectiveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Objective
-        fields = ["id", "title", "snippet", "description", "status", "owner", "relative_url", "absolute_url", "created_at", "updated_at"]
+        fields = ["id", "title", "snippet", "description", "status", "relative_url", "absolute_url", "created_at", "updated_at"]
         read_only_fields = ["id", "owner", "absolute_url", "relative_url", "created_at"]
 
     def get_absolute_url(self, obj):
         request = self.context.get("request")
         return request.build_absolute_uri(obj.pk)
-
+    
     def to_representation(self, instance):
         request = self.context.get("request")
         rep = super().to_representation(instance)
-        rep["owner"] = request.user.username
+        rep["owner_username"] = request.user.username
         if request.parser_context.get("kwargs"):
             rep.pop("relative_url")
             rep.pop("absolute_url")
-            rep.pop("description")
+            rep["owner_email"] = request.user.email
+            rep["owner_id"] = request.user.id
+
         else:
             rep.pop("description")
         return rep
