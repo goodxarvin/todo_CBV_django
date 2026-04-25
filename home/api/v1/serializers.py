@@ -20,6 +20,7 @@ class ObjectiveSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         request = self.context.get("request")
         rep = super().to_representation(instance)
+        rep["owner"] = request.user.username
         if request.parser_context.get("kwargs"):
             rep.pop("relative_url")
             rep.pop("absolute_url")
