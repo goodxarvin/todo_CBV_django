@@ -16,8 +16,14 @@ class Objective(models.Model):
     def __str__(self):
         return self.title
 
+    def get_snippet(self):
+        return self.description[:5]
+
     def get_absolute_url(self):
         return reverse('home:list_objective')
+
+    def get_absolute_api_url(self):
+        return reverse("home:api-v1:objective-detail", kwargs={"pk": self.pk})
 
 
 

@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.urls import include
 
 app_name = 'home'
 
@@ -10,4 +11,5 @@ urlpatterns = [
     path('delete/<int:pk>/', views.DeleteObjectiveView.as_view(), name='delete_objective'),
     path('update/<int:pk>/', views.UpdateObjectiveView.as_view(), name='update_objective'),
     path('finished/<int:pk>/', views.FinishedObjectiveView, name='finished_objective'),
+    path("api/v1/", include("home.api.v1.urls"), name="objective_api_v1")
 ]
