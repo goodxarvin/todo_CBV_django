@@ -21,6 +21,22 @@ from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
 from home.sitemaps import ObjectiveSitemap
 from django.http import HttpResponse
+from rest_framework import permissions
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="objective API",
+        default_version='v1',
+        description="this is an api for objective model",
+        contact=openapi.Contact(email="arvin@gmail.com"),
+        license=openapi.License(name="MIT License"),
+   ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 
 def robots_txt(request):
     lines = [
@@ -41,6 +57,9 @@ urlpatterns = [
     path("api-auth", include("rest_framework.urls")),
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     path("robots.txt", robots_txt, name="robots_txt"),
+    path("swagger/", schema_view.with_ui("swagger", cache_timeout=0), name="swagger-objective-api"),
+    path("swagger/output-obj.json", schema_view.without_ui(cache_timeout=0), name="swagger-objective-api-json"),
+    path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="redoc-objective-api")
 ]
 
 if settings.DEBUG:
