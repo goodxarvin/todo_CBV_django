@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     "django_filters",
     "rest_framework",
+    "rest_framework.authtoken",
+    'rest_framework_simplejwt',
     "drf_yasg",
     'home',
     'allauth',
@@ -162,6 +164,18 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 
 SITE_ID = 1 # default site id
 
-# chane user model
+# change user model
 
 AUTH_USER_MODEL = "accounts.User"
+
+
+# rest_framework settings
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES":[
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ]
+}

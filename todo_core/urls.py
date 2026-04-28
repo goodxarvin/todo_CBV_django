@@ -53,8 +53,9 @@ sitemaps = {
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('home.urls')),
+    path("api-auth/", include("rest_framework.urls")),
+    path("accounts-api/", include("accounts.urls")),
     path("accounts/", include("allauth.urls")),
-    path("api-auth", include("rest_framework.urls")),
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     path("robots.txt", robots_txt, name="robots_txt"),
     path("swagger/", schema_view.with_ui("swagger", cache_timeout=0), name="swagger-objective-api"),
