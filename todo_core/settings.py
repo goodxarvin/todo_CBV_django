@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'home',
     'allauth',
     'allauth.account',
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -160,3 +161,7 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 #AUTH_USER_MODEL = 'auth.User'
 
 SITE_ID = 1 # default site id
+
+# chane user model
+
+AUTH_USER_MODEL = "accounts.User"
