@@ -1,9 +1,14 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions
-from rest_framework.authtoken.serializers import AuthTokenSerializer
-from ...models import User
-
+from rest_framework_simplejwt.tokens import RefreshToken
+from ...models import User, Profile
+from typing import Any
+from rest_framework_simplejwt.serializers import TokenObtainSerializer
+from rest_framework_simplejwt.settings import api_settings
+from django.contrib.auth.models import update_last_login
+from jwt import decode
 
 class RegistrationSerializer(serializers.ModelSerializer):
 
@@ -38,7 +43,7 @@ class ResetPasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({"details": "password doesn't match"})
         
         elif not request.user.check_password(attrs.get("old_pass")):
-            raise serializers.ValidationError({"details": "wring password"})
+            raise serializers.ValidationError({"details": "wrong password"})
 
         try:
             validate_password(attrs.get("new_pass"))
@@ -52,3 +57,76 @@ class ResetPasswordSerializer(serializers.Serializer):
         instance.set_password(new_pass)
         instance.save()
         return instance
+
+
+class CustomTokenObtainPairSerializer(TokenObtainSerializer):
+    token_class = RefreshToken
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, str]:
+        data = super().validate(attrs)
+
+        refresh = self.get_token(self.user)
+
+        data["refresh"] = str(refresh)
+        data["access"] = str(refresh.access_token)
+
+        if api_settings.UPDATE_LAST_LOGIN:
+            update_last_login(None, self.user)
+
+        return data
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source="user.username", read_only=True)
+    class Meta:
+        model = Profile
+        fields = ["first_name", "last_name", "country", "phone", "username"]
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    username = serializers.CharField()
+
+    def validate(self, attrs):
+        username = attrs.get("username")
+        print(username)
+        try:
+            user = User.objects.get(username="string")
+        except User.DoesNotExist:
+            raise serializers.ValidationError({"details": "this username does not exist"})
+
+        attrs["username"] = username
+        return attrs
+
+
+class NewPasswordForgetSerializer(serializers.Serializer):
+    new_pass = serializers.CharField(required=True, write_only=True)
+    confirm_pass = serializers.CharField(required=True, write_only=True)
+
+    def validate(self, attrs):
+        request = self.context.get("request")
+        new_pass = attrs.get("new_pass")
+        confirm_pass = attrs.get("confirm_pass")
+        if new_pass != confirm_pass:
+            raise serializers.ValidationError({"details": "passwords does not match"})
+        elif not not self.instance.check_password(new_pass):
+            raise serializers.ValidationError({"details": "this is already your password"})
+        try:
+            validate_password(new_pass)
+        except exceptions.ValidationError as e:
+            raise serializers.ValidationError({"details:": list(e.messages)})
+        return super().validate(attrs)
+
+    def update(self, instance, validated_data):
+        new_pass = validated_data["new_pass"]
+        instance.set_password(new_pass)
+        instance.save()
+        return instance
+
+# class VerificationTokenSerializer(serializers.Serializer):
+
+#     access_token = serializers.CharField()
+
+#     def validate(self, attrs):
+#         access_token = attrs.get("access_token")
+#         print("------------------------------------------", attrs, "--------------------------------------")
+#         return "ok"
