@@ -1,7 +1,8 @@
 
 from django.shortcuts import get_object_or_404
-from ...models import Profile
 from django.contrib.auth import get_user_model
+from mail_templated.message import EmailMessage
+from jwt import decode
 from decouple import config
 from jwt.exceptions import ExpiredSignatureError, DecodeError
 from rest_framework import generics
@@ -21,8 +22,10 @@ from .serializers import (
     ForgotPasswordSerializer,
     NewPasswordForgetSerializer,
 )
-from mail_templated.message import EmailMessage
-from jwt import decode
+from .utils import EmailThread
+from ...models import Profile
+
+
 
 user = get_user_model()
 
@@ -46,7 +49,8 @@ class RegisterAPIView(generics.GenericAPIView):
             context={"name": username, "access_token": access_token},
             from_email="from@a.aa",
             to=["to@am.am",])
-        email_object.send()
+            
+        email_thread = EmailThread(email_object).start()
         return Response({"details": "your account has been created successfully and verification email sent", "usersname": username}
         , status=status.HTTP_201_CREATED)
 
@@ -119,7 +123,10 @@ class ResendVerificationAPIView(APIView):
             context={"name": username, "access_token": access_token},
             from_email="from@a.aa",
             to=["to@am.am",])
-        email_object.send()
+
+        email_thread = EmailThread(email_object).start()
+
+
         return Response({"details": "resent verification email successful"})
         
 
@@ -173,13 +180,16 @@ class ForgotPasswordAPIView(generics.GenericAPIView):
         print("-------------------------------", username)
         user_object = user.objects.get(username=username)
         access_token = f"http://127.0.0.1:8000/accounts-api/api/v1/new-password/{self.get_token_for_user(user_object)}"
+
         email_object = EmailMessage(
             subject="forgot password email",
             template_name="mail/forgot_password.tpl",
             context={"name": username, "access_token": access_token},
             from_email="from@a.aa",
             to=["to@am.am",])
-        email_object.send()
+        email_thread = EmailThread(email_object).start()
+
+
         return Response({"details": "resent reset password url successful"})
 
 class NewPasswordForgotAPIView(generics.GenericAPIView):
