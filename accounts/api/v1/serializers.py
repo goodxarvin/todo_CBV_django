@@ -1,15 +1,12 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions
 from rest_framework_simplejwt.tokens import RefreshToken
-from ...models import User, Profile
 from typing import Any
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.settings import api_settings
 from django.contrib.auth.models import update_last_login
-from jwt import decode
-
+from ...models import User, Profile
 class RegistrationSerializer(serializers.ModelSerializer):
 
     password1 = serializers.CharField(max_length=255, write_only=True)
@@ -88,13 +85,12 @@ class ForgotPasswordSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         username = attrs.get("username")
-        print(username)
         try:
-            user = User.objects.get(username="string")
+            user = User.objects.get(username=username)
         except User.DoesNotExist:
             raise serializers.ValidationError({"details": "this username does not exist"})
 
-        attrs["username"] = username
+        attrs["user"] = user
         return attrs
 
 

@@ -1,6 +1,8 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView, TokenObtainPairView
 from .. import views
-from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
+
+app_name = "account-urls"
 
 urlpatterns = [
     # account registration

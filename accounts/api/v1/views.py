@@ -10,10 +10,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.serializers import AuthTokenSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import (
     RegistrationSerializer,
     ResetPasswordSerializer,
@@ -90,17 +91,20 @@ class ResetPasswordAPIView(generics.GenericAPIView):
         return Response({"details": "password changed successfully"})
 
 
-class CustomTokenObtainPairView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated,]
+class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        data["username"] = request.user.username
-        data["email"] = request.user.email
+        data["username"] = request.data.get("username")
+        try: 
+            data["email"] = request.user.email
+        except AttributeError:
+            data["email"] = None
         return Response(data)
+
 
 
 class ResendVerificationAPIView(APIView):
@@ -166,6 +170,7 @@ class ProfileAPIView(generics.RetrieveUpdateAPIView):
         return obj
 
 class ForgotPasswordAPIView(generics.GenericAPIView):
+    permission_classes = [AllowAny,]
     serializer_class = ForgotPasswordSerializer
 
 
@@ -176,15 +181,14 @@ class ForgotPasswordAPIView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data["username"]
-        print("-------------------------------", username)
-        user_object = user.objects.get(username=username)
+        user_object = serializer.validated_data["user"]
+        # print("-------------------------------", username)
+        # user_object = user.objects.get(username=username)
         access_token = f"http://127.0.0.1:8000/accounts-api/api/v1/new-password/{self.get_token_for_user(user_object)}"
-
         email_object = EmailMessage(
             subject="forgot password email",
             template_name="mail/forgot_password.tpl",
-            context={"name": username, "access_token": access_token},
+            context={"name": user_object.username, "access_token": access_token},
             from_email="from@a.aa",
             to=["to@am.am",])
         email_thread = EmailThread(email_object).start()
