@@ -6,16 +6,24 @@ from .paginations import ObjectivePagination
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
-
 """createing an api base on viewsets with drf"""
+
 
 class ObjectiveViewSet(viewsets.ModelViewSet):
 
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
     serializer_class = ObjectiveSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = {"status":["exact"]}
-    search_fields = ["id", "title", "description", "owner__username", "owner__email",]
+    filterset_fields = {"status": ["exact"]}
+    search_fields = [
+        "id",
+        "title",
+        "description",
+        "owner__username",
+        "owner__email",
+    ]
     ordering_fields = ["created_at", "updated_at"]
     pagination_class = ObjectivePagination
 

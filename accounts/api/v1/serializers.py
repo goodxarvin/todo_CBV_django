@@ -7,6 +7,8 @@ from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.settings import api_settings
 from django.contrib.auth.models import update_last_login
 from ...models import User, Profile
+
+
 class RegistrationSerializer(serializers.ModelSerializer):
 
     password1 = serializers.CharField(max_length=255, write_only=True)
@@ -38,7 +40,7 @@ class ResetPasswordSerializer(serializers.Serializer):
         request = self.context.get("request")
         if attrs.get("new_pass") != attrs.get("confirm_pass"):
             raise serializers.ValidationError({"details": "password doesn't match"})
-        
+
         elif not request.user.check_password(attrs.get("old_pass")):
             raise serializers.ValidationError({"details": "wrong password"})
 
@@ -46,7 +48,7 @@ class ResetPasswordSerializer(serializers.Serializer):
             validate_password(attrs.get("new_pass"))
         except exceptions.ValidationError as e:
             raise serializers.ValidationError({"details": list(e.messages)})
-        
+
         return super().validate(attrs)
 
     def update(self, instance, validated_data):
@@ -75,6 +77,7 @@ class CustomTokenObtainPairSerializer(TokenObtainSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)
+
     class Meta:
         model = Profile
         fields = ["first_name", "last_name", "country", "phone", "username"]
@@ -88,7 +91,9 @@ class ForgotPasswordSerializer(serializers.Serializer):
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            raise serializers.ValidationError({"details": "this username does not exist"})
+            raise serializers.ValidationError(
+                {"details": "this username does not exist"}
+            )
 
         attrs["user"] = user
         return attrs
@@ -105,7 +110,9 @@ class NewPasswordForgetSerializer(serializers.Serializer):
         if new_pass != confirm_pass:
             raise serializers.ValidationError({"details": "passwords does not match"})
         elif not not self.instance.check_password(new_pass):
-            raise serializers.ValidationError({"details": "this is already your password"})
+            raise serializers.ValidationError(
+                {"details": "this is already your password"}
+            )
         try:
             validate_password(new_pass)
         except exceptions.ValidationError as e:
@@ -117,6 +124,7 @@ class NewPasswordForgetSerializer(serializers.Serializer):
         instance.set_password(new_pass)
         instance.save()
         return instance
+
 
 # class VerificationTokenSerializer(serializers.Serializer):
 

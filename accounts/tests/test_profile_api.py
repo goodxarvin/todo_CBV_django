@@ -12,6 +12,7 @@ def user_object():
     )
     return user
 
+
 @pytest.fixture
 def api_client():
     return APIClient()
@@ -30,19 +31,19 @@ class TestProfile:
         url = reverse("accounts:all-api-urls:profile-urls:profile-api")
         api_client.force_login(user=user_object)
         data = {
-        "first_name": "pytest",
-        "last_name": "proifle",
-        "country": "america",
-        "phone": "238575"
+            "first_name": "pytest",
+            "last_name": "proifle",
+            "country": "america",
+            "phone": "238575",
         }
         response = api_client.put(url, data)
         assert response.status_code == 200
-    
+
     def test_patch_profile_status_200(self, api_client, user_object):
         url = reverse("accounts:all-api-urls:profile-urls:profile-api")
         api_client.force_login(user=user_object)
         data = {
-        "first_name": "pytest",
+            "first_name": "pytest",
         }
         response = api_client.patch(url, data)
         assert response.status_code == 200

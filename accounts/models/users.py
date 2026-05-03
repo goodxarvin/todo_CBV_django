@@ -1,6 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    PermissionsMixin,
+    BaseUserManager,
+)
 from django.utils.translation import gettext_lazy as _
+
 
 class UserManager(BaseUserManager):
 
@@ -21,8 +26,7 @@ class UserManager(BaseUserManager):
             raise ValueError(_("upseruser must be a staff member"))
         if extra_fields.get("is_superuser") is False:
             raise ValueError(_("superuser mode must be active"))
-        return self.create_user(username, password, **extra_fields) 
-
+        return self.create_user(username, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -42,4 +46,3 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
-

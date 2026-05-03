@@ -10,13 +10,23 @@ class ObjectiveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Objective
-        fields = ["id", "title", "snippet", "description", "status", "relative_url", "absolute_url", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "title",
+            "snippet",
+            "description",
+            "status",
+            "relative_url",
+            "absolute_url",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "owner", "absolute_url", "relative_url", "created_at"]
 
     def get_absolute_url(self, obj):
         request = self.context.get("request")
         return request.build_absolute_uri(obj.pk)
-    
+
     def to_representation(self, instance):
         request = self.context.get("request")
         rep = super().to_representation(instance)
@@ -30,7 +40,7 @@ class ObjectiveSerializer(serializers.ModelSerializer):
         else:
             rep.pop("description")
         return rep
-    
+
     def create(self, validated_data):
         validated_data["owner"] = self.context.get("request").user
         return super().create(validated_data)

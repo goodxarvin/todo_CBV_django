@@ -8,4 +8,3 @@ router.register("objective", views.ObjectiveViewSet, basename="objective")
 
 
 urlpatterns = router.urls
-

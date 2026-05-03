@@ -1,4 +1,3 @@
-
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from mail_templated.message import EmailMessage
@@ -26,9 +25,8 @@ from .serializers import (
 from .utils import EmailThread
 from ...models import Profile
 
-
-
 user = get_user_model()
+
 
 class RegisterAPIView(generics.GenericAPIView):
     serializer_class = RegistrationSerializer
@@ -49,11 +47,19 @@ class RegisterAPIView(generics.GenericAPIView):
             template_name="mail/verification.tpl",
             context={"name": username, "access_token": access_token},
             from_email="from@a.aa",
-            to=["to@am.am",])
-            
+            to=[
+                "to@am.am",
+            ],
+        )
+
         email_thread = EmailThread(email_object).start()
-        return Response({"details": "your account has been created successfully and verification email sent", "usersname": username}
-        , status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                "details": "your account has been created successfully and verification email sent",
+                "usersname": username,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class CustomObtainAuthToken(ObtainAuthToken):
@@ -62,26 +68,37 @@ class CustomObtainAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
+        user = serializer.validated_data["user"]
         username = serializer.validated_data["username"]
         token, created = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key, "username": username}, status=status.HTTP_201_CREATED)
-
+        return Response(
+            {"token": token.key, "username": username}, status=status.HTTP_201_CREATED
+        )
 
 
 class DiscardAuthToken(APIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def post(self, request):
         try:
             request.user.auth_token.delete()
-            return Response({"details": "auth token deleted and loged out"}, status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {"details": "auth token deleted and loged out"},
+                status=status.HTTP_204_NO_CONTENT,
+            )
         except Token.DoesNotExist:
-            return Response({"details": "user signed out (auth token not found)"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"details": "user signed out (auth token not found)"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class ResetPasswordAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
     serializer_class = ResetPasswordSerializer
 
     def post(self, request, *args, **kwargs):
@@ -99,16 +116,17 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         data["username"] = request.data.get("username")
-        try: 
+        try:
             data["email"] = request.user.email
         except AttributeError:
             data["email"] = None
         return Response(data)
 
 
-
 class ResendVerificationAPIView(APIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def get_token_for_user(self, user):
         refresh = RefreshToken.for_user(user)
@@ -118,7 +136,10 @@ class ResendVerificationAPIView(APIView):
         username = request.user.username
         user_object = user.objects.get(username=username)
         if user_object.is_verified:
-            return Response({"details": "resend failed this account has already been verified"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"details": "resend failed this account has already been verified"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         access_token = f"http://127.0.0.1:8000/accounts-api/api/v1/verify-account/{self.get_token_for_user(user_object)}"
         email_object = EmailMessage(
@@ -126,21 +147,23 @@ class ResendVerificationAPIView(APIView):
             template_name="mail/verification_resend.tpl",
             context={"name": username, "access_token": access_token},
             from_email="from@a.aa",
-            to=["to@am.am",])
+            to=[
+                "to@am.am",
+            ],
+        )
 
         email_thread = EmailThread(email_object).start()
 
-
         return Response({"details": "resent verification email successful"})
-        
-
 
 
 class VerificationTokenAPIView(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
-        try: 
-            decoded_jwt = decode(kwargs["access_jwt"], config("DJANGO_SECRET_KEY"), algorithms=["HS256"])
+        try:
+            decoded_jwt = decode(
+                kwargs["access_jwt"], config("DJANGO_SECRET_KEY"), algorithms=["HS256"]
+            )
             user_id = decoded_jwt["user_id"]
             user_object = user.objects.get(pk=user_id)
 
@@ -148,19 +171,28 @@ class VerificationTokenAPIView(generics.GenericAPIView):
                 user_object.is_verified = True
                 user_object.save()
             else:
-                return Response({"details": "account has already been verified"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"details": "account has already been verified"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         except ExpiredSignatureError:
-            return Response({"details": "token expired"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            return Response(
+                {"details": "token expired"}, status=status.HTTP_406_NOT_ACCEPTABLE
+            )
 
         except DecodeError:
-            return Response({"details": "invalid signiture"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"details": "invalid signiture"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         return Response({"details": "your account has been verified successully"})
 
 
 class ProfileAPIView(generics.RetrieveUpdateAPIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [
+        IsAuthenticated,
+    ]
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()
 
@@ -169,10 +201,12 @@ class ProfileAPIView(generics.RetrieveUpdateAPIView):
         obj = get_object_or_404(queryset, user=self.request.user)
         return obj
 
-class ForgotPasswordAPIView(generics.GenericAPIView):
-    permission_classes = [AllowAny,]
-    serializer_class = ForgotPasswordSerializer
 
+class ForgotPasswordAPIView(generics.GenericAPIView):
+    permission_classes = [
+        AllowAny,
+    ]
+    serializer_class = ForgotPasswordSerializer
 
     def get_token_for_user(self, user):
         refresh = RefreshToken.for_user(user)
@@ -190,18 +224,25 @@ class ForgotPasswordAPIView(generics.GenericAPIView):
             template_name="mail/forgot_password.tpl",
             context={"name": user_object.username, "access_token": access_token},
             from_email="from@a.aa",
-            to=["to@am.am",])
+            to=[
+                "to@am.am",
+            ],
+        )
         email_thread = EmailThread(email_object).start()
 
-
         return Response({"details": "resent reset password url successful"})
+
 
 class NewPasswordForgotAPIView(generics.GenericAPIView):
     serializer_class = NewPasswordForgetSerializer
 
     def post(self, request, *args, **kwargs):
         try:
-            jwt_info = decode(kwargs["reset_pass_jwt"], config("DJANGO_SECRET_KEY"), algorithms=["HS256"])
+            jwt_info = decode(
+                kwargs["reset_pass_jwt"],
+                config("DJANGO_SECRET_KEY"),
+                algorithms=["HS256"],
+            )
             user_id = jwt_info.get("user_id")
             user_object = user.objects.get(pk=user_id)
             serializer = self.get_serializer(user_object, data=request.data)
@@ -209,9 +250,14 @@ class NewPasswordForgotAPIView(generics.GenericAPIView):
             serializer.save()
 
         except ExpiredSignatureError:
-            return Response({"details": "password reset token expired"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            return Response(
+                {"details": "password reset token expired"},
+                status=status.HTTP_406_NOT_ACCEPTABLE,
+            )
 
         except DecodeError:
-            return Response({"details": "invalid signiture"}, status=status.HTTP_400_BAD_REQUEST)
-    
-        return Response({"details" :"password changed successfully"})
+            return Response(
+                {"details": "invalid signiture"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response({"details": "password changed successfully"})

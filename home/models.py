@@ -6,7 +6,9 @@ from django.urls import reverse
 
 
 class Objective(models.Model):
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True
+    )
     title = models.CharField(max_length=255)
     description = models.TextField()
     status = models.BooleanField(default=False)
@@ -20,10 +22,7 @@ class Objective(models.Model):
         return self.description[:5]
 
     def get_absolute_url(self):
-        return reverse('home:list_objective')
+        return reverse("home:list_objective")
 
     def get_absolute_api_url(self):
         return reverse("home:api-v1:objective-detail", kwargs={"pk": self.pk})
-
-
-
