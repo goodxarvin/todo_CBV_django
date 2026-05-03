@@ -110,3 +110,10 @@ class TestObjectiveAPI:
         self.client.force_login(user=user_object)
         response = self.client.delete(url)
         assert response.status_code == 204
+
+    def test_objective_delete_status_401(self, user_object, objective_object):
+        url = reverse(
+            "home:api-v1:objective-detail", kwargs={"pk": objective_object.pk}
+        )
+        response = self.client.delete(url)
+        assert response.status_code == 401
