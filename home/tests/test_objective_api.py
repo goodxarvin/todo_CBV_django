@@ -89,7 +89,7 @@ class TestObjectiveAPI:
             "status": False,
         }
         response = self.client.put(url, data=data)
-        assert response.status_code == 400
+        assert response.status_code == 401
 
     def test_objective_update_patch_status_200(self, user_object, objective_object):
         url = reverse(
