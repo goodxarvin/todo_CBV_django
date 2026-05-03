@@ -9,6 +9,7 @@ django-mail-templated==2.6.5
 djangorestframework==3.17.1
 djangorestframework_simplejwt==5.5.1
 drf-yasg==1.21.15
+Faker==40.15.0
 gunicorn==25.1.0
 importlib_resources==7.1.0
 inflection==0.5.1
