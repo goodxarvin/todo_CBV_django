@@ -19,6 +19,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  worker:
+    command: python -m celery -A todo_core worker
+
 volumes:
   postgres_data:
 

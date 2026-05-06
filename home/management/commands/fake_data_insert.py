@@ -17,7 +17,6 @@ class Command(BaseCommand):
                 username=self.fake.user_name(),
                 password="test@123456",
             )
-            print(user.username)
             profile = Profile.objects.get(user=user)
             profile.first_name = self.fake.first_name()
             profile.last_name = self.fake.last_name()

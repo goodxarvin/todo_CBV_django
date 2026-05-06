@@ -24,6 +24,12 @@ from .serializers import (
 )
 from .utils import EmailThread
 from ...models import Profile
+from ...tasks import (
+    send_email_verification_worker,
+    resend_email_verification_worker,
+    forgot_password_email_worker,
+
+    )
 
 user = get_user_model()
 
@@ -42,17 +48,21 @@ class RegisterAPIView(generics.GenericAPIView):
         username = serializer.validated_data["username"]
         user_object = user.objects.get(username=username)
         access_token = f"http://127.0.0.1:8000/accounts-api/api/v1/verify-account/{self.get_token_for_user(user_object)}"
-        email_object = EmailMessage(
-            subject="test email",
-            template_name="mail/verification.tpl",
-            context={"name": username, "access_token": access_token},
-            from_email="from@a.aa",
-            to=[
-                "to@am.am",
-            ],
-        )
+        send_email_verification_worker
+        resend_email_verification_worker.delay(user_object.username, access_token)
+        # user_object = user.objects.get(username=username)
+        # access_token = f"http://127.0.0.1:8000/accounts-api/api/v1/verify-account/{self.get_token_for_user(user_object)}"
+        # email_object = EmailMessage(
+        #     subject="test email",
+        #     template_name="mail/verification.tpl",
+        #     context={"name": username, "access_token": access_token},
+        #     from_email="from@a.aa",
+        #     to=[
+        #         "to@am.am",
+        #     ],
+        # )
 
-        email_thread = EmailThread(email_object).start()
+        # email_thread = EmailThread(email_object).start()
         return Response(
             {
                 "details": "your account has been created successfully and verification email sent",
@@ -142,17 +152,18 @@ class ResendVerificationAPIView(APIView):
             )
 
         access_token = f"http://127.0.0.1:8000/accounts-api/api/v1/verify-account/{self.get_token_for_user(user_object)}"
-        email_object = EmailMessage(
-            subject="resend verification email",
-            template_name="mail/verification_resend.tpl",
-            context={"name": username, "access_token": access_token},
-            from_email="from@a.aa",
-            to=[
-                "to@am.am",
-            ],
-        )
+        resend_email_verification_worker.delay(user_object.username, access_token)
+        # email_object = EmailMessage(
+        #     subject="resend verification email",
+        #     template_name="mail/verification_resend.tpl",
+        #     context={"name": username, "access_token": access_token},
+        #     from_email="from@a.aa",
+        #     to=[
+        #         "to@am.am",
+        #     ],
+        # )
 
-        email_thread = EmailThread(email_object).start()
+        # email_thread = EmailThread(email_object).start()
 
         return Response({"details": "resent verification email successful"})
 
@@ -219,16 +230,17 @@ class ForgotPasswordAPIView(generics.GenericAPIView):
         # print("-------------------------------", username)
         # user_object = user.objects.get(username=username)
         access_token = f"http://127.0.0.1:8000/accounts-api/api/v1/new-password/{self.get_token_for_user(user_object)}"
-        email_object = EmailMessage(
-            subject="forgot password email",
-            template_name="mail/forgot_password.tpl",
-            context={"name": user_object.username, "access_token": access_token},
-            from_email="from@a.aa",
-            to=[
-                "to@am.am",
-            ],
-        )
-        email_thread = EmailThread(email_object).start()
+        forgot_password_email_worker.delay(user_object.username, access_token)
+        # email_object = EmailMessage(
+        #     subject="forgot password email",
+        #     template_name="mail/forgot_password.tpl",
+        #     context={"name": user_object.username, "access_token": access_token},
+        #     from_email="from@a.aa",
+        #     to=[
+        #         "to@am.am",
+        #     ],
+        # )
+        # email_thread = EmailThread(email_object).start()
 
         return Response({"details": "resent reset password url successful"})
 
