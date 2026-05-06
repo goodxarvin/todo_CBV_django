@@ -19,6 +19,12 @@ services:
       
     command: python -m celery -A todo_core worker --loglevel=info
 
+  beat:
+    volumes:
+      - .:/app
+
+    command: python -m celery -A todo_core beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
   smtp4dev:
     image: rnwood/smtp4dev:v3
     restart: on-failure

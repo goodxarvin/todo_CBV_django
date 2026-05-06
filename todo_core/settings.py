@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "django.contrib.sitemaps",
+    "django_celery_beat",
     "django_filters",
     "rest_framework",
     "rest_framework.authtoken",
@@ -190,4 +191,14 @@ EMAIL_PORT = 25
 
 # celery configuation
 
+
 CELERY_BROKER_URL = "redis://redis:6379/1"
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+CELERY_BEAT_SCHEDULE = {
+    "delete_objective": {
+        "task": "home.tasks.delete_completed_tasks_worker",
+        "schedule": 10,
+    }
+}

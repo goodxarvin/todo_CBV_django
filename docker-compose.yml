@@ -25,4 +25,14 @@ services:
       - todo_web
       - redis
 
+  beat:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    
+    depends_on:
+      - todo_web
+      - redis
+      
+
 
