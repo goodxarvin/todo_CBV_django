@@ -8,6 +8,17 @@ services:
     volumes:
       - .:/app
 
+
+  redis:
+    ports:
+      - "6379:6379"
+  
+  worker:
+    volumes:
+      - .:/app
+      
+    command: python -m celery -A todo_core worker --loglevel=info
+
   smtp4dev:
     image: rnwood/smtp4dev:v3
     restart: on-failure

@@ -14,8 +14,8 @@ COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# RUN echo 'Acquire::http::Proxy "http://22.27.147.34:8080";' > /etc/apt/apt.conf.d/99proxy \
-#  && echo 'Acquire::https::Proxy "http://22.27.147.34:8080";' >> /etc/apt/apt.conf.d/99proxy
+RUN echo 'Acquire::http::Proxy "http://22.93.201.17:8080";' > /etc/apt/apt.conf.d/99proxy \
+ && echo 'Acquire::https::Proxy "http://22.93.201.17:8080";' >> /etc/apt/apt.conf.d/99proxy
 
 
 RUN apt-get update && apt-get install -y postgresql-client
