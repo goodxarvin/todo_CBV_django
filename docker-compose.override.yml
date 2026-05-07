@@ -3,10 +3,13 @@ version: '3.8'
 services:
   todo_web:
     env_file:
-      - .env.dev_todo_web
+      - .env.example.dev_todo_web
     
     volumes:
       - .:/app
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 
   redis:

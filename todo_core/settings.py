@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "accounts",
+    "weather",
     "mail_templated",
 ]
 
@@ -190,4 +191,21 @@ EMAIL_PORT = 25
 
 # celery configuation
 
-CELERY_BROKER_URL = "redis://redis:6379/1"
+CELERY_BROKER_URL = "redis://redis:6379/3"
+
+
+# django-redis settings for cache
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/4",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+# open weather api
+
+OPENWEATHER_API_KEY = config("OPENWEATHER_API_KEY", default="test")
