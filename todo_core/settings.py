@@ -205,3 +205,7 @@ CACHES = {
         }
     }
 }
+
+# open weather api
+
+OPENWEATHER_API_KEY = config("OPENWEATHER_API_KEY", default="test")
