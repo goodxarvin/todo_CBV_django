@@ -11,12 +11,19 @@ proxies = {
     "https": "http://host.docker.internal:10808",
 }
 
-@method_decorator(cache_page(60 * 5), name="dispatch") # implement this decorator on dispatch method which handles requests and responses --> name="disatch"
+params = {
+    "lat": 33.44,
+    "lon": -94.04,
+    "appid": "306b5dd93fe07aa6292e721861a95055",
+}
+
+@method_decorator(cache_page(60 * 20), name="dispatch") # implement this decorator on dispatch method which handles requests and responses --> name="disatch"
 class InfoExampleAPIView(APIView):
 
     def get(self, request):
         response = requests.get(
-            "https://fe210ec8-8439-45dd-a38e-e502358113d1.mock.pstmn.io/weather",
+            "https://api.openweathermap.org/data/2.5/weather",
+            params=params,
             proxies=proxies,
         )
         return Response(response.json())
