@@ -3,7 +3,7 @@ version: '3.8'
 services:
   todo_web:
     env_file:
-      - .env.prod_todo_web
+      - .env.example.prod_todo_web
     entrypoint: ["/app/entrypoint.sh"]
     depends_on:
       - db

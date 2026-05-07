@@ -75,6 +75,7 @@ urlpatterns = [
         schema_view.with_ui("redoc", cache_timeout=0),
         name="redoc-objective-api",
     ),
+    path("weather/", include("weather.urls")),
 ]
 
 if settings.DEBUG:
