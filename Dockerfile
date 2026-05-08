@@ -22,8 +22,8 @@ RUN apt-get update && apt-get install -y postgresql-client
 
 COPY . .
 
-RUN chmod +x entrypoint.sh
-
+RUN chmod +x command.sh
+RUN chmod +x command.dev.sh
 
 
 

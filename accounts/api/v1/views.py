@@ -47,9 +47,8 @@ class RegisterAPIView(generics.GenericAPIView):
         serializer.save()
         username = serializer.validated_data["username"]
         user_object = user.objects.get(username=username)
-        access_token = f"http://127.0.0.1:8000/accounts-api/api/v1/verify-account/{self.get_token_for_user(user_object)}"
-        send_email_verification_worker
-        resend_email_verification_worker.delay(user_object.username, access_token)
+        access_token = f"http://127.0.0.1:80/accounts-api/api/v1/verify-account/{self.get_token_for_user(user_object)}"
+        send_email_verification_worker.delay(user_object.username, access_token)
         # user_object = user.objects.get(username=username)
         # access_token = f"http://127.0.0.1:8000/accounts-api/api/v1/verify-account/{self.get_token_for_user(user_object)}"
         # email_object = EmailMessage(
@@ -151,7 +150,7 @@ class ResendVerificationAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        access_token = f"http://127.0.0.1:8000/accounts-api/api/v1/verify-account/{self.get_token_for_user(user_object)}"
+        access_token = f"http://127.0.0.1:80/accounts-api/api/v1/verify-account/{self.get_token_for_user(user_object)}"
         resend_email_verification_worker.delay(user_object.username, access_token)
         # email_object = EmailMessage(
         #     subject="resend verification email",
@@ -168,12 +167,12 @@ class ResendVerificationAPIView(APIView):
         return Response({"details": "resent verification email successful"})
 
 
-class VerificationTokenAPIView(generics.GenericAPIView):
+class VerificationTokenAPIView(APIView):
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, access_jwt):
         try:
             decoded_jwt = decode(
-                kwargs["access_jwt"], config("DJANGO_SECRET_KEY"), algorithms=["HS256"]
+                access_jwt, config("DJANGO_SECRET_KEY"), algorithms=["HS256"]
             )
             user_id = decoded_jwt["user_id"]
             user_object = user.objects.get(pk=user_id)
@@ -229,7 +228,7 @@ class ForgotPasswordAPIView(generics.GenericAPIView):
         user_object = serializer.validated_data["user"]
         # print("-------------------------------", username)
         # user_object = user.objects.get(username=username)
-        access_token = f"http://127.0.0.1:8000/accounts-api/api/v1/new-password/{self.get_token_for_user(user_object)}"
+        access_token = f"http://127.0.0.1:80/accounts-api/api/v1/new-password/{self.get_token_for_user(user_object)}"
         forgot_password_email_worker.delay(user_object.username, access_token)
         # email_object = EmailMessage(
         #     subject="forgot password email",

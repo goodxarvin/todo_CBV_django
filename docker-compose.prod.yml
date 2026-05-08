@@ -3,8 +3,8 @@ version: '3.8'
 services:
   todo_web:
     env_file:
-      - .env.example.prod_todo_web
-    entrypoint: ["/app/entrypoint.sh"]
+      - .env.prod_todo_web
+    command: ["./command.sh"]
     depends_on:
       - db
 
@@ -14,8 +14,8 @@ services:
     restart: always
     env_file:
       - .env.db
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
