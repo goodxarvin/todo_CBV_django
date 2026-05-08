@@ -5,12 +5,13 @@ services:
     env_file:
       - .env.example.dev_todo_web
     
-    volumes:
-      - .:/app
+    # volumes:
+    #   - .:/app
 
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+    command: "./command.dev.sh"
 
   redis:
     ports:

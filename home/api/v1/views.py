@@ -28,4 +28,8 @@ class ObjectiveViewSet(viewsets.ModelViewSet):
     pagination_class = ObjectivePagination
 
     def get_queryset(self):
+
+        if getattr(self, 'swagger_fake_view', False):
+            return Objective.objects.none()
+
         return Objective.objects.filter(owner=self.request.user)
