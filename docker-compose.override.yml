@@ -8,10 +8,10 @@ services:
     # volumes:
     #   - .:/app
 
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
     command: "./command.dev.sh"
+
+    ports:
+      - "8000:8000"
 
   redis:
     ports:
