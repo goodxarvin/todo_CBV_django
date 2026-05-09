@@ -31,7 +31,7 @@ jobs:
       - name: execute changes on vps
         uses: appleboy/ssh-action@master
         with :
-          user: ${{secrets.USERNAME}}
+          username: ${{secrets.USERNAME}}
           password: ${{secrets.PASSWORD}}
           host: ${{secrets.HOST}}
           port: ${{secrets.PORT}}
