@@ -8,8 +8,8 @@ on:
 
 jobs:
 
-  build:
-
+  Test:
+    name: Test
     runs-on: ubuntu-latest
 
     steps:
@@ -18,3 +18,27 @@ jobs:
       run: docker compose up -d
     - name: run test
       run: docker compose exec todo_web sh -c "python -m pytest ."
+
+  Deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    name: Deploy
+    needs: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: execute changes on vps
+        uses: appleboy/ssh-action@master
+        with :
+          user: ${{secrets.USERNAME}}
+          password: ${{secrets.PASSWORD}}
+          host: ${{secrets.HOST}}
+          port: ${{secrets.PORT}}
+          script: |
+            cd ${{secrets.PROJECT_PATH}}
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml stop
+            git pull
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+
+
