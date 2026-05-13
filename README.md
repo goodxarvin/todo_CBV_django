@@ -280,12 +280,12 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 2. **Collect static files**
    ```bash
-   docker-compose -f docker-compose.prod.yml exec web python manage.py collectstatic --noinput
+   docker-compose -f docker-compose.prod.yml exec todo_web python manage.py collectstatic --noinput
    ```
 
 3. **Run migrations**
    ```bash
-   docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec web python manage.py migrate
+   docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec todo_web python manage.py migrate
    ```
 
 4. **Configure Nginx** via `default.conf`
