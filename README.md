@@ -244,10 +244,10 @@ docker-compose down
 docker-compose logs -f web
 
 # Run management commands
-docker-compose exec web python manage.py <command>
+docker-compose exec todo_web python manage.py <command>
 
 # Production deployment
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
 ## 🔐 Security
@@ -275,7 +275,7 @@ docker-compose -f docker-compose.prod.yml up -d
 
 1. **Use production compose file**
    ```bash
-   docker-compose -f docker-compose.prod.yml up -d
+   docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
    ```
 
 2. **Collect static files**
@@ -285,7 +285,7 @@ docker-compose -f docker-compose.prod.yml up -d
 
 3. **Run migrations**
    ```bash
-   docker-compose -f docker-compose.prod.yml exec web python manage.py migrate
+   docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec web python manage.py migrate
    ```
 
 4. **Configure Nginx** via `default.conf`
